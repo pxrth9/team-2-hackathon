@@ -40,7 +40,17 @@ async def on_message(msg):
         await msg.channel.send(help)
 
     #EVENT : UPDATE USER
-    if message_content.startswith('!update'):
+    if message_content.startswith('!edit'):
+      help=('I can update it for you')
+      await msg.channel.send(help)
+
+    #EVENT : INFO USER
+    if message_content.startswith('!info'):
+      help=('I can update it for you')
+      await msg.channel.send(help)
+
+    #EVENT : SCHEDULE
+    if message_content.startswith('!schedule'):
       help=('I can update it for you')
       await msg.channel.send(help)
 
