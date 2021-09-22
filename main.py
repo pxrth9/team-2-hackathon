@@ -46,12 +46,12 @@ async def on_message(msg):
 
     #EVENT : INFO USER
     if message_content.startswith('!info'):
-      help=('I can update it for you')
+      help=('I can send you the info')
       await msg.channel.send(help)
 
     #EVENT : SCHEDULE
     if message_content.startswith('!schedule'):
-      help=('I can update it for you')
+      help=('I can schedule a meeting')
       await msg.channel.send(help)
 
 client.run(DISCORD_API)
