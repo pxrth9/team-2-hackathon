@@ -19,8 +19,7 @@ DB_FIELDS = (
             "discord",
             "email",
             "role",
-            "track",
-            "calendy",
+            "calendly",
             "github",
             "linkedin",
             "primary_OS",
@@ -44,7 +43,7 @@ async def usage(err_type, channel):
     if (err_type == "edit"):
         edit_help=(
             '''>>> Usage : `!edit @user field value` \n'''
-            ''' \t\tfields: Name, Pronouns, Pod, Track, Location, Timezone\n'''
+            ''' \t\tfields: Name, Pronouns, Pod, Location, Timezone\n'''
             ''' \t\t\tEmail, Calendly, GitHub, LinkedIn'''
         )
         await channel.send(edit_help)
@@ -99,37 +98,70 @@ async def on_message(msg):
     #EVENT : INFO USER
     if message_content.startswith('!info'):
       if msg.mentions:
-        info = ""
-        for user in msg.mentions:
 
-          # Get User Info
+        info, name, pronouns, pod, calendly, github = "", "", "", "", "", ""
+        linkedin, email, location, timezone, favorite_language = "", "", "", "", ""
 
-          # Parse Firebase, match and output data based on user ID
+        # Populate User Info
+        # Parse Firebase, match and output data based on user ID
+        ref = db.reference("/fellows")
+        uid = str(msg.mentions[0])
+        data = ref.get()
+        found = False
 
-          embed=discord.Embed(
-          title="About Me",
-              url="https://mlh-fellowship.trainualapp.com/users/294366",
-              description= user.display_name + "'s MLH Fellowship Profile",
-              color=discord.Color.blue())
-          embed.set_author(name=user.name, url="https://twitter.com/nikhilxvytla", icon_url=user.avatar_url)
-          embed.set_thumbnail(url="https://i.imgur.com/axLm3p6.jpeg")
-          embed.add_field(name="Name", value="Nikhil Vytla", inline=False)
-          embed.add_field(name="Pronouns", value="(he/him)", inline=False)
-          embed.add_field(name="__Pod__", value="4.2.0", inline=False)
-          embed.add_field(name="__Track__", value="GitHub Externship", inline=False)
-          embed.add_field(name="Favorite Language(s)", value="`Python`, `Javascript`", inline=False)
-          embed.add_field(name="GitHub", value="> https://github.com/nikhil-vytla", inline=False)
-          embed.add_field(name="LinkedIn", value="> https://linkedin.com/in/nikhil-vytla", inline=False)
-          embed.add_field(name="Favorite Joke", value="||Why did the chicken cross the road? To get to the other side!||", inline=False)
-          embed.set_footer(text="Learn more about me: nikhilvytla.com")
+        for mentioned in msg.mentions:
+          for k, usr in data.items():
+              if usr["discord"] == uid:
+                  name = usr["name"]
+                  first_name = name.split(' ')[0]
+                  pronouns = usr["pronouns"]
+                  pod = usr["pod"]
+                  discord_tag = usr["discord"]
+                  email = usr["email"]
+                  role = usr["role"]
+                  calendly = usr["calendly"]
+                  github = usr["github"]
+                  linkedin = usr["linkedin"]
+                  primary_OS = usr["primary_OS"]
+                  timezone = usr["timezone"]
+                  location = usr["location"]
+                  favorite_language = usr["favorite_language"]
+                  found = True
 
-          await msg.channel.send(embed=embed)
+                  # Embed color based on track
+                  if "4.0" in pod:
+                    color = discord.Color.red()
+                  elif "4.2" in pod:
+                    color = discord.Color.blue()
+                  else:
+                    color = discord.Color.green()
+
+                  break
+          if found: 
+
+            embed=discord.Embed(
+            title="About " + first_name + " (@" + discord_tag + ")",
+                description= "MLH Fellowship Profile",
+                color=color)
+            embed.set_author(name=name, icon_url=mentioned.avatar_url)
+            embed.set_thumbnail(url=mentioned.avatar_url)
+            embed.add_field(name="**Name**", value=name, inline=False)
+            embed.add_field(name="**Pronouns**", value=pronouns, inline=False)
+            embed.add_field(name="__Pod__", value=pod, inline=False)
+            embed.add_field(name="**Favorite Language(s)**", value=favorite_language, inline=False)
+            embed.add_field(name="**GitHub**", value="> https://github.com/" + github, inline=False)
+            embed.add_field(name="**LinkedIn**", value="> "+ linkedin, inline=False)
+            embed.add_field(name="**Favorite Joke**", value="||Why did the chicken cross the road? To get to the other side!||", inline=False)
+            embed.set_footer(text="Schedule a 1-on-1: " + calendly)
+
+            await msg.channel.send(embed=embed)
+          else:
+            await msg.channel.send(f"No entry found for {uid}")
       
       else:
+        # if USER does not have info, return message 
         info = "Looking for profile info? Make sure to specify a user/users (ex. `!info @mlhducky`)."
-      # if USER does not have info, return message 
-      # "@USER does not have any info available"
-      await msg.channel.send(info)
+        await msg.channel.send(info)
 
     #EVENT : SCHEDULE
     if message_content.startswith('!schedule'):
