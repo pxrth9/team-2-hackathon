@@ -88,7 +88,10 @@ async def on_message(msg):
 
     #EVENT : HELP
     if message_content.startswith('!help'):
-        help=('I got your request')
+        help=('```!edit @user key value-> Edit your own profile'
+            +'\n!info @mention -> Get Info about your fellow pod mate'
+            +'\n!schedule @user -> Schedule a time slot with your fellow pod mate```'
+        )
         await msg.channel.send(help)
 
     #EVENT : UPDATE USER
