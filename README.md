@@ -4,7 +4,7 @@ MLH Icebreaker Bot is a bot written in python to make it easy for users to get t
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install MLH Icebreaker Bot.
 
 ```
 pip install -r requirements.txt
