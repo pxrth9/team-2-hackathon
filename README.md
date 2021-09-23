@@ -16,7 +16,6 @@ python main.py <-- TO Run the bot locally
 
 Add the discord bot to your server using this link: [MLH Icebreaker Bot](https://discord.com/api/oauth2/authorize?client_id=890319728474750997&permissions=534723951680&scope=bot)
 
-
 ```
 !edit @user key value-> Edit your own profile
 !info @mention -> Get Info about your fellow pod mate
