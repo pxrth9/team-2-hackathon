@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv, main
 import json
 import discord
+import webbrowser
 
 # #API KEYS
 load_dotenv()
@@ -38,30 +39,35 @@ if not firebase_admin._apps:
             'databaseURL': 'https://discord-intro-bot-default-rtdb.firebaseio.com/'
         })
 
-async def usage(err_type, channel):
+async def usage(channel, err_type = None):
     '''Send an error message and usage help'''
-    if (err_type == "edit"):
-        edit_help=(
-            '''>>> Usage : `!edit @user field value` \n'''
-            ''' \t\tfields: Name, Pronouns, Pod, Location, Timezone\n'''
-            ''' \t\t\tEmail, Calendly, GitHub, LinkedIn'''
+    if err_type is None:
+        help=('```!edit @user key value-> Edit your own profile'
+            +'\n!info @mention -> Get Info about your fellow pod mate'
+            +'\n!schedule @user -> Schedule a time slot with your fellow pod mate```'
         )
-        await channel.send(edit_help)
+        return await channel.send(help)
+    elif (err_type == "edit"):
+        edit_help=(
+            '''```Usage : `!edit @user field value` \n'''
+            ''' \t\tfields: Name, Pronouns, Pod, Location, Timezone\n'''
+            ''' \t\t\t\tEmail, Calendly, GitHub, LinkedIn```'''
+        )
+        return await channel.send(edit_help)
         
 async def update(msg):
     '''Parse edit command from message and execute it'''
     args = msg.content.strip(' ').split(' ', 3)
     if len(args) != 4:
-        return await usage("edit",msg.channel)
+        return await usage(msg.channel,"edit")
     field = args[2].strip(' ').lower()
     if field not in DB_FIELDS:
-        return await usage("edit",msg.channel)
+        return await usage(msg.channel,"edit")
     elif len(msg.raw_mentions) != 1:
-        return await usage("edit",msg.channel)
+        return await usage(msg.channel,"edit")
     else: #update database
         ref = db.reference("/fellows")
         uid = str( msg.mentions[0] )
-        print(uid)
         val = args[-1]
         data = ref.get()
         found = False
@@ -88,18 +94,14 @@ async def on_message(msg):
 
     #EVENT : HELP
     if message_content.startswith('!help'):
-        help=('```!edit @user key value-> Edit your own profile'
-            +'\n!info @mention -> Get Info about your fellow pod mate'
-            +'\n!schedule @user -> Schedule a time slot with your fellow pod mate```'
-        )
-        await msg.channel.send(help)
+        await usage(msg.channel)
 
     #EVENT : UPDATE USER
-    if message_content.startswith('!edit'):
+    elif message_content.startswith('!edit'):
         await update(msg)
 
     #EVENT : INFO USER
-    if message_content.startswith('!info'):
+    elif message_content.startswith('!info'):
       if msg.mentions:
 
         info, name, pronouns, pod, calendly, github = "", "", "", "", "", ""
@@ -167,8 +169,34 @@ async def on_message(msg):
         await msg.channel.send(info)
 
     #EVENT : SCHEDULE
-    if message_content.startswith('!schedule'):
-      schedule=('I can schedule a meeting')
-      await msg.channel.send(schedule)
+    elif message_content.startswith('!schedule'):
+        if msg.mentions:
+            ref = db.reference("/fellows")
+            uid = str(msg.mentions[0])
+            data = ref.get()
 
+            # look for user and send the calendly link
+            found = False
+            for k, usr in data.items():
+                if usr["discord"] == uid:
+                    found = True
+                    link = usr.get("calendly")
+                    name = usr.get("name",uid)
+                    break
+
+            if not found:
+                await msg.channel.send(f"No entry found for {uid}")
+            else:
+                if link is None:
+                    await msg.channel.send(f"No Calendly link found for {uid}") 
+                else:
+                    embed = discord.Embed(
+                                title=f"Schedule a meeting with {name}",
+                                url=link,
+                                color=discord.Color.red()
+                            )
+                    await msg.channel.send(embed=embed)
+        else:
+            await usage(msg.channel)
+            
 client.run(DISCORD_API)
