@@ -24,10 +24,10 @@ Our primary challenge was finding and scheduling time to work this week. Our tea
 
 Another challenge was working with a combination of frameworks and tools we weren't familiar with. While we had varied experience with Python and Firebase, we had never utilized the discord.py library alongside Firebase. Implementing features while learning about them for the first time was challenging but immensely satisfying when we saw our bot working for the first time!
 
-## Accomplishments that we're proud of
+## Accomplishments that we're proud of:
 
-- shipping a minimum viable product, especially with all of our team's scheduling issues and time-zone conflicts
-- integrating Firebase with discord.py
+- Shipping a minimum viable product, especially with all of our team's scheduling issues and time-zone conflicts
+- Integrating Firebase with discord.py
 
 ## What we learned
 
